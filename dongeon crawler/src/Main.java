@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.imageio.ImageIO;
+import java.io.File;
 
 public class Main {
 
@@ -11,6 +13,8 @@ public class Main {
         displayZoneFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         renderEngine = new RenderEngine();
+        Sprite test = new Sprite(ImageIO.read(new File("./img/tree.png")),200,300,64,64);
+        renderEngine.addToRenderList(test);
 
         Timer renderTimer = new Timer(50,(time)-> renderEngine.update());
 

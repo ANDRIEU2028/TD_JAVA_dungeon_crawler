@@ -10,12 +10,24 @@ public class RenderEngine extends JPanel implements Engine {
     public RenderEngine() {
         this.renderList = new ArrayList<>();
     }
+    public void setRenderList(List<Displayable> renderList) {
+        this.renderList = renderList;
+    }
 
-    @Override
-    public void update() {
+    public void addToRenderList(Displayable displayable) {
+        this.renderList.add(displayable);
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
+    public void update() {
+        this.repaint();
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        for (Displayable d : renderList) {
+            d.draw(g);
+        }
     }
 }
