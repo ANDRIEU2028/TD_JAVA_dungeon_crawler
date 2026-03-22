@@ -6,6 +6,7 @@ public class Main {
 
     JFrame displayZoneFrame;
     RenderEngine renderEngine;
+    GameEngine GameEngine;
 
     public Main() throws Exception{
         displayZoneFrame= new JFrame("Java Labs");
@@ -13,15 +14,21 @@ public class Main {
         displayZoneFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         renderEngine = new RenderEngine();
-        Sprite test = new Sprite(ImageIO.read(new File("./img/tree.png")),200,300,64,64);
-        renderEngine.addToRenderList(test);
+        Sprite arbre = new Sprite(ImageIO.read(new File("./img/tree.png")),200,300,64,64);
+
+        DynamicSprite hero = new DynamicSprite(ImageIO.read(new File("./img/heroTileSheetLowRes.png"))
+                ,200,300,48,50);
+
+        GameEngine = new GameEngine(hero);
+        renderEngine.addToRenderList(arbre);
+        renderEngine.addToRenderList(hero);
 
         Timer renderTimer = new Timer(50,(time)-> renderEngine.update());
-
+        Timer GameEngine = new Timer(50,(time)-> GameEngine.update());
         renderTimer.start();
 
         displayZoneFrame.getContentPane().add(renderEngine);
-
+        displayZoneFrame.addKeyListener(GameEngine);
         displayZoneFrame.setVisible(true);
 
     }
