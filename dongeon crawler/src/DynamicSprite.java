@@ -1,19 +1,194 @@
 import java.awt.*;
+import java.util.ArrayList;
+import java.awt.geom.Rectangle2D;
 
 public class DynamicSprite extends SolidSprite {
     protected boolean isWalking = true;
     protected double speed = 5;
     protected final int spriteSheetNumberOfColumn = 10;
     protected int timeBetweenFrame = 200;
-    protected Direction direction = Direction.NORTH;
+    protected Direction direction = Direction.EAST;
+    private boolean hasFinishedLevel = false;
+    private int hp =10;
+    private long lastDamageTime = 0;
+    private final long invincibilityDelay = 2000;
+    private boolean gameover = false;
 
     public DynamicSprite(Image image, double x, double y, double width, double height) {
         super(image, x, y, width, height);
     }
 
+    private void move(){
+        switch (direction){
+            case NORTH -> {
+                this.y-=speed;
+            }
+            case EAST -> {
+                this.x+=speed;
+            }
+            case WEST -> {
+                this.x-=speed;
+            }
+            case SOUTH -> {
+                this.y+=speed;
+            }
+        }
+    }
+    private void nextstage(){
+        this.hasFinishedLevel=true;
+    }
+    private void damage(){
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastDamageTime > invincibilityDelay) {
+            this.hp--;
+            this.lastDamageTime = currentTime;
+            if (this.hp<= 0) {
+                this.gameover=true;
+            }
+        }
+    }
+    private void heal(){
+        if (this.hp< 10) {
+            this.hp++;;
+        }
+
+    }
+
+
+
+    public boolean getHasFinishedLevel(){
+        return hasFinishedLevel;
+    }
+    public int getHP() {
+        return hp;
+    }
+    public boolean getGameOver(){
+        return gameover;
+    }
+
     public void setDirection(Direction direction) {
         this.direction = direction;
     }
+    public void setHasFinishedLevel(boolean hasFinishedLevel){
+        this.hasFinishedLevel = hasFinishedLevel;
+    }
+
+    private boolean isMovingPossible(ArrayList<Sprite> environment) {
+        double nextX = this.x;
+        double nextY = this.y;
+
+        switch (direction) {
+            case NORTH -> nextY -= speed;
+            case SOUTH -> nextY += speed;
+            case WEST  -> nextX -= speed;
+            case EAST  -> nextX += speed;
+        }
+
+        Rectangle2D.Double hitBox = new Rectangle2D.Double(nextX+15, nextY+25, this.width-25,
+                this.height-30);
+        for (Sprite sprite : environment) {
+            if (sprite instanceof SolidSprite && sprite != this) {
+                Rectangle2D.Double obstacleRect = new Rectangle2D.Double(sprite.x,
+                        sprite.y, sprite.width, sprite.height);
+                if (hitBox.intersects(obstacleRect)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    private boolean isNextStage(ArrayList<Sprite> environment){
+        double nextX = this.x;
+        double nextY = this.y;
+
+        switch (direction) {
+            case NORTH -> nextY -= speed;
+            case SOUTH -> nextY += speed;
+            case WEST  -> nextX -= speed;
+            case EAST  -> nextX += speed;
+        }
+
+        Rectangle2D.Double hitBox = new Rectangle2D.Double(nextX+15, nextY+25, this.width-25,
+                this.height-30);
+
+        for (Sprite sprite : environment) {
+            if (sprite instanceof StageSprite && sprite != this) {
+                Rectangle2D.Double scale = new Rectangle2D.Double(sprite.x,
+                        sprite.y, sprite.width, sprite.height);
+                if (hitBox.intersects(scale)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    private boolean isTrap(ArrayList<Sprite> environment){
+        double nextX = this.x;
+        double nextY = this.y;
+
+        switch (direction) {
+            case NORTH -> nextY -= speed;
+            case SOUTH -> nextY += speed;
+            case WEST  -> nextX -= speed;
+            case EAST  -> nextX += speed;
+        }
+
+        Rectangle2D.Double hitBox = new Rectangle2D.Double(nextX+15, nextY+25, this.width-25,
+                this.height-30);
+
+        for (Sprite sprite : environment) {
+            if (sprite instanceof DamageSprite && sprite != this) {
+                Rectangle2D.Double trap = new Rectangle2D.Double(sprite.x,
+                        sprite.y, sprite.width, sprite.height);
+                if (hitBox.intersects(trap)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    private boolean isHealing(ArrayList<Sprite> environment) {
+        double nextX = this.x;
+        double nextY = this.y;
+
+        switch (direction) {
+            case NORTH -> nextY -= speed;
+            case SOUTH -> nextY += speed;
+            case WEST  -> nextX -= speed;
+            case EAST  -> nextX += speed;
+        }
+
+        Rectangle2D.Double hitBox = new Rectangle2D.Double(nextX+15, nextY+25, this.width-25,
+                this.height-30);
+        for (Sprite sprite : environment) {
+            if (sprite instanceof HealSprite && sprite != this) {
+                Rectangle2D.Double soin = new Rectangle2D.Double(sprite.x,
+                        sprite.y, sprite.width, sprite.height);
+                if (hitBox.intersects(soin)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void moveIfPossible(ArrayList<Sprite> environment){
+        if (isMovingPossible(environment)){
+            move();
+        }
+        if (isNextStage(environment)){
+            nextstage();
+        }
+        if(isTrap(environment)){
+            damage();
+        }
+        if(isHealing(environment)){
+            heal();
+        }
+
+    }
+
+
     @Override
     public void draw(Graphics g) {
         int index = (int) ((System.currentTimeMillis() / timeBetweenFrame) % spriteSheetNumberOfColumn);
