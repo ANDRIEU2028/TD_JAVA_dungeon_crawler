@@ -20,7 +20,7 @@ public class DynamicSprite extends SolidSprite {
     }
 
 
-    private void move(){
+    public void move(){
         switch (direction){
             case NORTH -> {
                 this.y-=speed;
@@ -42,7 +42,7 @@ public class DynamicSprite extends SolidSprite {
     private void passpastlevel(){
         this.passpastLevel=true;
     }
-    private void damage(){
+    public void damage(){
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastDamageTime > invincibilityDelay) {
             this.hp--;
@@ -104,7 +104,7 @@ public class DynamicSprite extends SolidSprite {
         this.passpastLevel = passpastlevel;
     }
 
-    private boolean isMovingPossible(ArrayList<Sprite> environment) {
+    public boolean isMovingPossible(ArrayList<Sprite> environment) {
         Rectangle2D.Double hitBox =getHitBox();
         for (Sprite sprite : environment) {
             if (sprite instanceof SolidSprite && sprite != this) {
@@ -169,7 +169,19 @@ public class DynamicSprite extends SolidSprite {
         }
         return false;
     }
-
+    private boolean isTapMob(ArrayList<Sprite> environment) {
+        Rectangle2D.Double hitBox = getHitBox();
+        for (Sprite sprite : environment) {
+            if (sprite instanceof MobSprite && sprite != this) {
+                Rectangle2D.Double scale = new Rectangle2D.Double(sprite.x,
+                        sprite.y, sprite.width, sprite.height);
+                if (hitBox.intersects(scale)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     public void moveIfPossible(ArrayList<Sprite> environment){
         if (isMovingPossible(environment)){
             move();
@@ -186,56 +198,15 @@ public class DynamicSprite extends SolidSprite {
         if (isPastStage(environment)){
             passpastlevel();
         }
-        MobSprite collidingMob = getCollidingMob(environment);
-        if (collidingMob != null) {
-            // On inflige les dégâts spécifiques du monstre
-            for (int i = 0; i < collidingMob.getDamagePoints(); i++) {
-                this.damage();
-            }
+        if (isTapMob(environment)){
+          damage();
         }
-        checkEnemyCollision(environment);
+
 
     }
 
-       private MobSprite getCollidingMob(ArrayList<Sprite> environment) {
-        double nextX = this.x;
-        double nextY = this.y;
 
-        switch (direction) {
-            case NORTH -> nextY -= speed;
-            case SOUTH -> nextY += speed;
-            case WEST  -> nextX -= speed;
-            case EAST  -> nextX += speed;
-        }
 
-        Rectangle2D.Double hitBox = new Rectangle2D.Double(nextX + 15, nextY + 25, this.width - 25, this.height - 30);
-
-        for (Sprite sprite : environment) {
-            if (sprite instanceof MobSprite && sprite != this) {
-                Rectangle2D.Double mobRect = new Rectangle2D.Double(sprite.x, sprite.y, sprite.width, sprite.height);
-                if (hitBox.intersects(mobRect)) {
-                    return (MobSprite) sprite;
-                }
-            }
-        }
-        return null;
-    }
-
-    private void checkEnemyCollision(ArrayList<Sprite> environment) {
-
-        Rectangle2D.Double heroHitBox = new Rectangle2D.Double(this.x + 15, this.y + 25, this.width - 25, this.height - 30);
-
-        for (Sprite sprite : environment) {
-            if (sprite instanceof MobSprite) {
-
-                Rectangle2D.Double mobHitBox = new Rectangle2D.Double(sprite.x, sprite.y, sprite.width, sprite.height);
-
-                if (heroHitBox.intersects(mobHitBox)){
-                    ((MobSprite) sprite).attack(this);
-                }
-            }
-        }
-    }
 
     @Override
     public void draw(Graphics g) {
