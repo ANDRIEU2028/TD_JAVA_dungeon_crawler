@@ -31,6 +31,8 @@ public class Main {
         Playground level1 = new Playground("./data/level1.txt");
         Playground level2 = new Playground("./data/level2.txt");
 
+        renderEngine.setGameEngine(gameEngine);
+        renderEngine.setLevel(1);
         ArrayList<Displayable> levelSprites = level1.getSpriteList();
         for (Displayable d : levelSprites) {
             renderEngine.addToRenderList(d);
@@ -45,6 +47,9 @@ public class Main {
         Timer renderTimer = new Timer(50,(time)-> renderEngine.update());
         Timer gameTimer = new Timer(50,(time)-> gameEngine.update());
         Timer physicTimer = new Timer(50, (time) -> {
+            if(!gameEngine.getStart())
+                return;
+
             if (hero.getGameOver()) {
                 renderTimer.stop();
                 gameTimer.stop();
@@ -54,10 +59,13 @@ public class Main {
 
             if (hero.getHasFinishedLevel()) {
                 renderEngine.resetRenderList();
+                displayZoneFrame.setSize(790,600);
+                displayZoneFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+                renderEngine.setLevel(2);
                 for (Displayable d : level2.getSpriteList()) {
                     renderEngine.addToRenderList(d);
                 }
-                renderEngine.addToRenderList(hero); 
+                renderEngine.addToRenderList(hero);
                 physicEngine.setEnvironment(level2.getEnvironment());
 
                 hero.x = 150;

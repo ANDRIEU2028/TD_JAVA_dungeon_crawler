@@ -4,12 +4,12 @@ import java.awt.geom.Rectangle2D;
 
 public class DynamicSprite extends SolidSprite {
     protected boolean isWalking = true;
-    protected double speed = 5;
+    protected double speed = 0;
     protected final int spriteSheetNumberOfColumn = 10;
     protected int timeBetweenFrame = 200;
     protected Direction direction = Direction.EAST;
     private boolean hasFinishedLevel = false;
-    private int hp =10;
+    private int hp =5;
     private long lastDamageTime = 0;
     private final long invincibilityDelay = 2000;
     private boolean gameover = false;
@@ -48,7 +48,7 @@ public class DynamicSprite extends SolidSprite {
         }
     }
     private void heal(){
-        if (this.hp< 10) {
+        if (this.hp< 5) {
             this.hp++;;
         }
 
@@ -66,6 +66,9 @@ public class DynamicSprite extends SolidSprite {
         return gameover;
     }
 
+    public void setSpeed(double speed){
+        this.speed=speed;
+    }
     public void setDirection(Direction direction) {
         this.direction = direction;
     }

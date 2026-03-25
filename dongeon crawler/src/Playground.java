@@ -7,10 +7,6 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.awt.image.BufferedImage;
 
-
-
-
-
 public class Playground {
     private ArrayList<Sprite> environment = new ArrayList<>();
     public Playground (String pathName){
@@ -20,14 +16,15 @@ public class Playground {
             final Image imageArmorHigh = tileSet.getSubimage(9 * size, 13 * size, size, size);
             final Image imageArmorLow = tileSet.getSubimage(9 * size, 14 * size, size, size);
             final Image imagePont= tileSet.getSubimage(4 * size, 14 * size, size, size);
-            final Image imageCanalHG= tileSet.getSubimage(4 * size, 0 * size, size, size);
-            final Image imageCanalHD= tileSet.getSubimage(4 * size, 1 * size, size, size);
+            final Image imageCanalHG= tileSet.getSubimage(4 * size, 0 , size, size);
+            final Image imageCanalHD= tileSet.getSubimage(4 * size, size, size, size);
             final Image imageCanalBD= tileSet.getSubimage(4 * size, 2 * size, size, size);
             final Image imageCanalBG= tileSet.getSubimage(4 * size, 3 * size, size, size);
             final Image imageCanalCH= tileSet.getSubimage(3 * size, 14 * size, size, size);
             final Image imageCanalCV= tileSet.getSubimage(3 * size, 13 * size, size, size);
-            final Image imageSol= tileSet.getSubimage(1 * size, 9 * size, size, size);
+            final Image imageSol= tileSet.getSubimage(size, 9 * size, size, size);
             final Image imagePilonne= tileSet.getSubimage(2 * size, 6 * size, size, size);
+            final Image imageLave= tileSet.getSubimage(7 * size, 6 * size, size, size);
             final Image imageTree = ImageIO.read(new File("./img/tree.png"));
             final Image imageGrass = ImageIO.read(new File("./img/grass.png"));
             final Image imageRock = ImageIO.read(new File("./img/rock.png"));
@@ -63,8 +60,10 @@ public class Playground {
             final int imageCanalCVHeight = imageCanalCV.getHeight(null);
             final int imageSolWidth = imageSol.getWidth(null);
             final int imageSolHeight = imageSol.getHeight(null);
-            final int imagePilonneWidth = imageSol.getWidth(null);
-            final int imagePilonneHeight = imageSol.getHeight(null);
+            final int imagePilonneWidth = imagePilonne.getWidth(null);
+            final int imagePilonneHeight = imagePilonne.getHeight(null);
+            final int imageLaveWidth = imageLave.getWidth(null);
+            final int imageLaveHeight = imageLave.getHeight(null);
             BufferedReader bufferedReader = new BufferedReader(new FileReader(pathName));
             String line=bufferedReader.readLine();
             int lineNumber = 0;
@@ -142,6 +141,9 @@ public class Playground {
                             environment.add(new SolidSprite(imagePilonne, columnNumber * (1.3*imagePilonneWidth-2),
                                     lineNumber * (1.3*imagePilonneHeight-2), 1.36*imagePilonneWidth,
                                     1.36*imagePilonneHeight));
+                            break;
+                        case 'L' : environment.add(new DamageSprite(imageLave,columnNumber*(1.3*imageLaveWidth-2),
+                                lineNumber*(1.3*imageLaveHeight-2), 1.36*imageLaveWidth, 1.36*imageLaveHeight));
                             break;
                     }
 
