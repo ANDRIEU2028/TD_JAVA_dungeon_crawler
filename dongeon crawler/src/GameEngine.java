@@ -8,6 +8,7 @@ public class GameEngine implements Engine,KeyListener{
     private final DynamicSprite hero;
     private boolean game_start = false;
     private double speed_i=5;
+    private double speed_u=speed_i;
     private double stop=0;
 
 
@@ -27,25 +28,26 @@ public class GameEngine implements Engine,KeyListener{
     public void keyPressed(KeyEvent e) {
         switch(e.getKeyCode()){
             case KeyEvent.VK_UP :
-                hero.setSpeed(speed_i);
+                hero.setSpeed(speed_u);
                 hero.setDirection(Direction.NORTH);
                 break;
             case KeyEvent.VK_DOWN :
-                hero.setSpeed(speed_i);
+                hero.setSpeed(speed_u);
                 hero.setDirection(Direction.SOUTH);
                 break;
             case KeyEvent.VK_RIGHT:
-                hero.setSpeed(speed_i);
+                hero.setSpeed(speed_u);
                 hero.setDirection(Direction.EAST);
                 break;
             case KeyEvent.VK_LEFT:
-                hero.setSpeed(speed_i);
+                hero.setSpeed(speed_u);
                 hero.setDirection(Direction.WEST);
                 break;
             case KeyEvent.VK_ENTER:
                 game_start=true;
                 break;
             case KeyEvent.VK_SPACE:
+                speed_u=15;
                 break;
 
         }
@@ -67,7 +69,7 @@ public class GameEngine implements Engine,KeyListener{
                 hero.setSpeed(stop);
                 break;
             case KeyEvent.VK_SPACE:
-                hero.setSpeed(speed_i);
+                speed_u=speed_i;
                 break;
         }
 

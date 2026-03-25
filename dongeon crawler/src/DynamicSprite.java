@@ -8,7 +8,8 @@ public class DynamicSprite extends SolidSprite {
     protected final int spriteSheetNumberOfColumn = 10;
     protected int timeBetweenFrame = 200;
     protected Direction direction = Direction.EAST;
-    private boolean hasFinishedLevel = false;
+    private boolean passnextLevel = false;
+    private boolean passpastLevel = false;
     private int hp =5;
     private long lastDamageTime = 0;
     private final long invincibilityDelay = 2000;
@@ -17,6 +18,7 @@ public class DynamicSprite extends SolidSprite {
     public DynamicSprite(Image image, double x, double y, double width, double height) {
         super(image, x, y, width, height);
     }
+
 
     private void move(){
         switch (direction){
@@ -34,8 +36,11 @@ public class DynamicSprite extends SolidSprite {
             }
         }
     }
-    private void nextstage(){
-        this.hasFinishedLevel=true;
+    private void passnextlevel(){
+        this.passnextLevel=true;
+    }
+    private void passpastlevel(){
+        this.passpastLevel=true;
     }
     private void damage(){
         long currentTime = System.currentTimeMillis();
@@ -56,8 +61,11 @@ public class DynamicSprite extends SolidSprite {
 
 
 
-    public boolean getHasFinishedLevel(){
-        return hasFinishedLevel;
+    public boolean getPassNextLevel(){
+        return passnextLevel;
+    }
+    public boolean getPassPastLevel(){
+        return passpastLevel;
     }
     public int getHP() {
         return hp;
@@ -65,18 +73,7 @@ public class DynamicSprite extends SolidSprite {
     public boolean getGameOver(){
         return gameover;
     }
-
-    public void setSpeed(double speed){
-        this.speed=speed;
-    }
-    public void setDirection(Direction direction) {
-        this.direction = direction;
-    }
-    public void setHasFinishedLevel(boolean hasFinishedLevel){
-        this.hasFinishedLevel = hasFinishedLevel;
-    }
-
-    private boolean isMovingPossible(ArrayList<Sprite> environment) {
+    private Rectangle2D.Double getHitBox(){
         double nextX = this.x;
         double nextY = this.y;
 
@@ -89,6 +86,26 @@ public class DynamicSprite extends SolidSprite {
 
         Rectangle2D.Double hitBox = new Rectangle2D.Double(nextX+15, nextY+25, this.width-25,
                 this.height-30);
+
+        return hitBox;
+    }
+
+
+    public void setSpeed(double speed){
+        this.speed=speed;
+    }
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+    public void setPassNextLevel(boolean passnextlevel){
+        this.passnextLevel = passnextlevel;
+    }
+    public void setPassPastLevel(boolean passpastlevel){
+        this.passpastLevel = passpastlevel;
+    }
+
+    private boolean isMovingPossible(ArrayList<Sprite> environment) {
+        Rectangle2D.Double hitBox =getHitBox();
         for (Sprite sprite : environment) {
             if (sprite instanceof SolidSprite && sprite != this) {
                 Rectangle2D.Double obstacleRect = new Rectangle2D.Double(sprite.x,
@@ -101,21 +118,22 @@ public class DynamicSprite extends SolidSprite {
         return true;
     }
     private boolean isNextStage(ArrayList<Sprite> environment){
-        double nextX = this.x;
-        double nextY = this.y;
-
-        switch (direction) {
-            case NORTH -> nextY -= speed;
-            case SOUTH -> nextY += speed;
-            case WEST  -> nextX -= speed;
-            case EAST  -> nextX += speed;
-        }
-
-        Rectangle2D.Double hitBox = new Rectangle2D.Double(nextX+15, nextY+25, this.width-25,
-                this.height-30);
-
+        Rectangle2D.Double hitBox =getHitBox();
         for (Sprite sprite : environment) {
-            if (sprite instanceof StageSprite && sprite != this) {
+            if (sprite instanceof NextStageSprite && sprite != this) {
+                Rectangle2D.Double scale = new Rectangle2D.Double(sprite.x,
+                        sprite.y, sprite.width, sprite.height);
+                if (hitBox.intersects(scale)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    private boolean isPastStage(ArrayList<Sprite> environment) {
+        Rectangle2D.Double hitBox = getHitBox();
+        for (Sprite sprite : environment) {
+            if (sprite instanceof PastStageSprite && sprite != this) {
                 Rectangle2D.Double scale = new Rectangle2D.Double(sprite.x,
                         sprite.y, sprite.width, sprite.height);
                 if (hitBox.intersects(scale)) {
@@ -126,19 +144,7 @@ public class DynamicSprite extends SolidSprite {
         return false;
     }
     private boolean isTrap(ArrayList<Sprite> environment){
-        double nextX = this.x;
-        double nextY = this.y;
-
-        switch (direction) {
-            case NORTH -> nextY -= speed;
-            case SOUTH -> nextY += speed;
-            case WEST  -> nextX -= speed;
-            case EAST  -> nextX += speed;
-        }
-
-        Rectangle2D.Double hitBox = new Rectangle2D.Double(nextX+15, nextY+25, this.width-25,
-                this.height-30);
-
+        Rectangle2D.Double hitBox =getHitBox();
         for (Sprite sprite : environment) {
             if (sprite instanceof DamageSprite && sprite != this) {
                 Rectangle2D.Double trap = new Rectangle2D.Double(sprite.x,
@@ -151,18 +157,7 @@ public class DynamicSprite extends SolidSprite {
         return false;
     }
     private boolean isHealing(ArrayList<Sprite> environment) {
-        double nextX = this.x;
-        double nextY = this.y;
-
-        switch (direction) {
-            case NORTH -> nextY -= speed;
-            case SOUTH -> nextY += speed;
-            case WEST  -> nextX -= speed;
-            case EAST  -> nextX += speed;
-        }
-
-        Rectangle2D.Double hitBox = new Rectangle2D.Double(nextX+15, nextY+25, this.width-25,
-                this.height-30);
+        Rectangle2D.Double hitBox =getHitBox();
         for (Sprite sprite : environment) {
             if (sprite instanceof HealSprite && sprite != this) {
                 Rectangle2D.Double soin = new Rectangle2D.Double(sprite.x,
@@ -180,13 +175,16 @@ public class DynamicSprite extends SolidSprite {
             move();
         }
         if (isNextStage(environment)){
-            nextstage();
+            passnextlevel();
         }
         if(isTrap(environment)){
             damage();
         }
         if(isHealing(environment)){
             heal();
+        }
+        if (isPastStage(environment)){
+            passpastlevel();
         }
 
     }

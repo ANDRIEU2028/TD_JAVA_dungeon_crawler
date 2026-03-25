@@ -8,7 +8,7 @@ public class RenderEngine extends JPanel implements Engine {
     private List<Displayable> renderList;
     private DynamicSprite hero;
     private long time_start=System.currentTimeMillis();
-    private int level;
+    protected Level level=Level.LEVEL1;
     private GameEngine gameEngine;
 
 
@@ -23,7 +23,7 @@ public class RenderEngine extends JPanel implements Engine {
     public void setHero(DynamicSprite hero) {
         this.hero = hero;
     }
-    public void setLevel(int level){
+    public void setLevel(Level level){
         this.level=level;
     }
     public void setGameEngine(GameEngine gameEngine){
@@ -59,39 +59,21 @@ public class RenderEngine extends JPanel implements Engine {
             g.drawString("appuyez sur entrée" , 105, 345);
         }
         else if (hero != null) {
-            if(this.level==1){
+
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, level.getWindowwidht(), 20);
+            g.setFont(new Font("Arial Rounded", Font.BOLD, 10));
+            g.setColor(Color.WHITE);
+            g.drawString("HP : " + hero.getHP(), 20, 15);
+            g.drawString("Time : " + (int)((System.currentTimeMillis() - time_start) / 1000) + " s",
+                    level.getWindowwidht()-100, 15);
+            if(hero.getGameOver()){
                 g.setColor(Color.BLACK);
-                g.fillRect(0, 0, 400, 20);
-                g.setFont(new Font("Arial Rounded", Font.BOLD, 10));
-                g.setColor(Color.WHITE);
-                g.drawString("Vie : " + hero.getHP(), 20, 15);
-                g.drawString("Time : " + (int)((System.currentTimeMillis() - time_start) / 1000) + " s",
-                        300, 15);
-                if(hero.getGameOver()){
-                    g.setColor(Color.BLACK);
-                    g.fillRect(0, 0, 400, 600);
-                    g.setColor(Color.RED);
-                    g.setFont(new Font("Arial Rounded", Font.BOLD, 50)); // Police
-                    g.drawString("GAME" , 120, 275);
-                    g.drawString("OVER" , 125, 325);
-                }
-            }
-            if(this.level==2){
-                g.setColor(Color.BLACK);
-                g.fillRect(0, 0, 790, 20);
-                g.setFont(new Font("Arial Rounded", Font.BOLD, 10));
-                g.setColor(Color.WHITE);
-                g.drawString("Vie : " + hero.getHP(), 20, 15);
-                g.drawString("Time : " + (int)((System.currentTimeMillis() - time_start) / 1000) + " s",
-                        700, 15);
-                if(hero.getGameOver()){
-                    g.setColor(Color.BLACK);
-                    g.fillRect(0, 0, 790, 600);
-                    g.setColor(Color.RED);
-                    g.setFont(new Font("Arial Rounded", Font.BOLD, 50)); // Police
-                    g.drawString("GAME" , 320, 275);
-                    g.drawString("OVER" , 325, 325);
-                }
+                g.fillRect(0, 0, level.getWindowwidht(), level.getWindowheight());
+                g.setColor(Color.RED);
+                g.setFont(new Font("Arial Rounded", Font.BOLD, 50)); // Police
+                g.drawString("GAME" , level.getWindowwidht()-(level.getWindowwidht()/2)-(level.getWindowwidht()/5), 275);
+                g.drawString("OVER" , level.getWindowwidht()-(level.getWindowwidht()/2)-(level.getWindowwidht()/5), 325);
             }
 
         }

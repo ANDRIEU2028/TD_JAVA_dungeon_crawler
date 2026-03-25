@@ -80,7 +80,7 @@ public class Playground {
                         case 'R' : environment.add(new SolidSprite(imageRock,columnNumber*imageRockWidth,
                                 lineNumber*imageRockHeight,  imageRockWidth, imageRockHeight));
                             break;
-                        case 'S' : environment.add(new StageSprite(imageTrap,columnNumber* imageTrapWidth,
+                        case 'S' : environment.add(new NextStageSprite(imageTrap,columnNumber* imageTrapWidth,
                                 lineNumber*imageTrapHeight, imageTrapWidth, imageTrapHeight));
                             break;
                         case 'P' : environment.add(new DamageSprite(imageTrap,columnNumber* imageDownScaleWidth,
@@ -145,6 +145,16 @@ public class Playground {
                         case 'L' : environment.add(new DamageSprite(imageLave,columnNumber*(1.3*imageLaveWidth-2),
                                 lineNumber*(1.3*imageLaveHeight-2), 1.36*imageLaveWidth, 1.36*imageLaveHeight));
                             break;
+                        case '/' :
+                            environment.add(new NextStageSprite(imageSol, columnNumber * (1.3*imageSolWidth-2),
+                                    lineNumber * (1.3*imageSolHeight-2), 1.36*imageSolWidth,
+                                    1.36*imageSolHeight));
+                            break;
+                        case ':' :
+                            environment.add(new PastStageSprite(imageSol, columnNumber * (1.3*imageSolWidth-2),
+                                    lineNumber * (1.3*imageSolHeight-2), 1.36*imageSolWidth,
+                                    1.36*imageSolHeight));
+                            break;
                     }
 
                     columnNumber++;
@@ -168,7 +178,7 @@ public class Playground {
     public ArrayList<Sprite> getStageSpriteList() {
         ArrayList<Sprite> stageSpriteArrayList = new ArrayList<>();
         for (Sprite sprite : environment) {
-            if (sprite instanceof StageSprite) stageSpriteArrayList.add(sprite);
+            if (sprite instanceof NextStageSprite) stageSpriteArrayList.add(sprite);
         }
         return stageSpriteArrayList;
     }

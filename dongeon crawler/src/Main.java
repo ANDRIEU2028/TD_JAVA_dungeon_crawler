@@ -12,12 +12,13 @@ public class Main {
     RenderEngine renderEngine;
     GameEngine gameEngine;
     PhysicEngine physicEngine;
-
+    Level actual_level=Level.LEVEL1;
     public Main() throws Exception{
         displayZoneFrame = new JFrame("Java Labs");
-        displayZoneFrame.setSize(400,600);
-        displayZoneFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        Level[] levels=Level.values();
 
+        displayZoneFrame.setSize(actual_level.getWindowwidht(),actual_level.getWindowheight());
+        displayZoneFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         DynamicSprite hero = new DynamicSprite(ImageIO.read(new File("./img/heroTileSheetLowRes.png")),
                 200,300,48,50);
 
@@ -28,20 +29,20 @@ public class Main {
         displayZoneFrame.getContentPane().add(renderEngine);
         displayZoneFrame.setVisible(true);
 
-        Playground level1 = new Playground("./data/level1.txt");
-        Playground level2 = new Playground("./data/level2.txt");
+        Playground level = new Playground(actual_level.getPath());
 
         renderEngine.setGameEngine(gameEngine);
-        renderEngine.setLevel(1);
-        ArrayList<Displayable> levelSprites = level1.getSpriteList();
+        renderEngine.setLevel(actual_level);
+        ArrayList<Displayable> levelSprites = level.getSpriteList();
         for (Displayable d : levelSprites) {
             renderEngine.addToRenderList(d);
         }
 
         renderEngine.addToRenderList(hero);
         physicEngine.addToMovingSpriteList(hero);
-        physicEngine.setEnvironment(level1.getEnvironment());
+        physicEngine.setEnvironment(level.getEnvironment());
         renderEngine.setHero(hero);
+
 
 
         Timer renderTimer = new Timer(50,(time)-> renderEngine.update());
@@ -57,20 +58,40 @@ public class Main {
             }
             physicEngine.update();
 
-            if (hero.getHasFinishedLevel()) {
+            if (hero.getPassNextLevel()) {
+                Level next_level=levels[actual_level.getFrameLineNumber()+1];
                 renderEngine.resetRenderList();
-                displayZoneFrame.setSize(790,600);
+                actual_level=levels[next_level.getFrameLineNumber()];
+
+                displayZoneFrame.setSize(next_level.getWindowwidht(),next_level.getWindowheight());
                 displayZoneFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-                renderEngine.setLevel(2);
-                for (Displayable d : level2.getSpriteList()) {
+                renderEngine.setLevel(next_level);
+                Playground new_level = new Playground(next_level.getPath());
+                for (Displayable d : new_level.getSpriteList()) {
                     renderEngine.addToRenderList(d);
                 }
                 renderEngine.addToRenderList(hero);
-                physicEngine.setEnvironment(level2.getEnvironment());
+                physicEngine.setEnvironment(new_level.getEnvironment());
+                hero.x = hero.x - 20;
+                hero.setPassNextLevel(false);
+            }
+            if (hero.getPassPastLevel()) {
+                Level next_level=levels[actual_level.getFrameLineNumber()-1];
+                renderEngine.resetRenderList();
+                actual_level=levels[next_level.getFrameLineNumber()];
 
-                hero.x = 150;
-                hero.y = 400;
-                hero.setHasFinishedLevel(false);
+                displayZoneFrame.setSize(next_level.getWindowwidht(),next_level.getWindowheight());
+                displayZoneFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+                renderEngine.setLevel(next_level);
+                Playground new_level = new Playground(next_level.getPath());
+                for (Displayable d : new_level.getSpriteList()) {
+                    renderEngine.addToRenderList(d);
+                }
+                renderEngine.addToRenderList(hero);
+                physicEngine.setEnvironment(new_level.getEnvironment());
+                hero.x = hero.x - 20 ;
+
+                hero.setPassPastLevel(false);
             }
         });
 
