@@ -22,6 +22,8 @@ public class Main {
         DynamicSprite hero = new DynamicSprite(ImageIO.read(new File("./img/heroTileSheetLowRes.png")),
                 200,300,48,50);
 
+        MobSprite ennemy = new MobSprite(ImageIO.read(new File("./img/heroTileSheetLowRes.png")),400,200,48,50,2);
+
         renderEngine = new RenderEngine();
         physicEngine = new PhysicEngine();
         gameEngine = new GameEngine(hero);
@@ -71,6 +73,7 @@ public class Main {
                     renderEngine.addToRenderList(d);
                 }
                 renderEngine.addToRenderList(hero);
+                renderEngine.addToRenderList(ennemy);
                 physicEngine.setEnvironment(new_level.getEnvironment());
                 hero.x = hero.x - 20;
                 hero.setPassNextLevel(false);
